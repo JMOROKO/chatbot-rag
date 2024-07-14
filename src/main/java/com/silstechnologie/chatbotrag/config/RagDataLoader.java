@@ -20,7 +20,7 @@ public class RagDataLoader {
     @Value("classpath:/pdfs/cv.pdf")
     private Resource pdfRessource;
 
-    @Value("store-data-v1.json")
+    @Value("store-data-v2.json")
     private String storeFile;
 
     //si une erreur survient à ce niveau il faut aller dans le terminal et faire : ollama run mistral
