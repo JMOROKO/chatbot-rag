@@ -13,6 +13,11 @@
         "route": "chat",
         "params": {},
         "title": "Chat"
+      },
+      {
+        "route": "person",
+        "params": {},
+        "title": "Person"
       }
     ]
   }
