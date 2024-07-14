@@ -2,6 +2,18 @@
   {
     "route": "",
     "params": {},
-    "title": "Index"
+    "title": "Layout",
+    "children": [
+      {
+        "route": "",
+        "params": {},
+        "title": "Index"
+      },
+      {
+        "route": "chat",
+        "params": {},
+        "title": "Chat"
+      }
+    ]
   }
 ]
