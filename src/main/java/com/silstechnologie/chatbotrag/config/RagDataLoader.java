@@ -7,9 +7,11 @@ import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -23,6 +25,13 @@ public class RagDataLoader {
 
     @Value("store-data-v2.json")
     private String storeFile;
+    private JdbcClient jdbcClient;
+    private VectorStore vectorStore;
+
+    public RagDataLoader(JdbcClient jdbcClient, VectorStore vectorStore) {
+        this.jdbcClient = jdbcClient;
+        this.vectorStore = vectorStore;
+    }
 
     //si une erreur survient à ce niveau il faut aller dans le terminal et faire : ollama run mistral
     //@TODO c'est bien llama3 qui est désigné comme modèle à utiliser mais pourquoi le système ne comprends pas et cherche à utilisé mistral?
@@ -57,8 +66,19 @@ public class RagDataLoader {
     }
 
     //utilisation de pg vectore store
-    //@PostConstruct
+    @PostConstruct //signifie après l'instantiation de la class
     public void initStore(){
+        Integer count = jdbcClient.sql("select count(*) from vector_store").query(Integer.class).single();
+        if( count == 0){
+            PagePdfDocumentReader pdfDocumentReader = new PagePdfDocumentReader(pdfRessource);
+            //recuperer chaque page du fichier pdf dans une liste
+            List<Document> documents = pdfDocumentReader.get();
+            TextSplitter textSplitter = new TokenTextSplitter();
+            //diviser chaque page en petit bout de fichier
+            List<Document> chumks = textSplitter.split(documents);
+            //savegarder les informations dans le vectore store
+            vectorStore.accept(chumks);
 
+        }
     }
 }
